@@ -132,6 +132,8 @@ kpi = f'''<div class="kpis">
 <div class="kpi"><div class="v">{n0(R['equity'])} <span>m.kr</span></div><div class="l">Eigið fé Stafa (35%), losun +{n0(R['release'])} við endurfjármögnun</div></div>
 </div>'''
 
+HDR_GRID = ['Sviðsmynd / leiga m.vsk'] + [n0(r) for r in rents]
+GRID = tbl(HDR_GRID, grid_rows, numcols=tuple(range(1, len(rents) + 1)))
 page = f'''<!doctype html><html lang="is"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="robots" content="noindex,nofollow">
 <title>Þ113 Hamrar — tilboð Stafa</title>
 <style>
@@ -179,7 +181,7 @@ td{{padding:5px 7px;border-bottom:1px solid #eef2f6;vertical-align:top}} td.n,th
 <div class="co" id="leiga"><h2>4. Leiguverðs- og ávöxtunarmódel</h2>
 <p>Spegill Hamranes-líkans v2.2: 25 ára VNV-tryggð leiga (verðbætt +6,7% frá tilboðsdegi til afhendingar), rekstrarkostnaður eiganda (fasteignaskattur 1,32% + vatn/fráveita 0,17% af fasteignamati, tryggingar 0,12% og viðhald 0,1/0,2/0,3% af brunabótamati, umsýsla 1%), verðmat á NOI árs 1 við 5,7%, framkvæmdalán 65% á 10,2%, endurfjármögnun með verðtryggðu jafngreiðslubréfi RIKS37 2,86% + 100 pkt, LTV 67,7%, skattur 20% með 3% fyrningu, lokavirði ár 25. Verðbólga 4%.</p>
 {chart()}
-<div class="scroll">{tbl(["Sviðsmynd \\ leiga m.vsk"]+[n0(r) for r in rents],grid_rows,numcols=tuple(range(1,len(rents)+1)))}</div>
+<div class="scroll">{GRID}</div>
 {tbl(["Lykiltala við 5.650","Gildi"],[["Nettóleiga ár 1 / NOI ár 1",f"{n0(R['rent1'])} / {n0(R['noi1'])} m.kr"],["Verðmæti við afhendingu @5,7%",f"{n0(R['value'])} m.kr (verðmæti/kostnaður {R['value']/C['total']:.2f})".replace(".",",")],["Framkvæmdalán / eigið fé",f"{n0(R['loan'])} / {n0(R['equity'])} m.kr"],["Skuldabréf 67,7% LTV / losun við endurfjármögnun",f"{n0(R['bond'])} / +{n0(R['release'])} m.kr"],["IRR nafn / raun · NPV@9% · DSCR · MOIC sala strax",f"{pct(R['irr_n'])} / {pct(R['irr_r'])} · +{n0(R['npv'])} · {R['dscr']:.2f} · {R['moic_sale']:.2f}".replace(".",",")]])}
 </div>
 <div class="co" id="svidsmyndir"><h2>5. Sviðsmyndir</h2>
