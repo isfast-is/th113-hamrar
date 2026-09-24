@@ -3,13 +3,17 @@ import math
 BASE = dict(
     A_haed_gross=1368.5, stair_m2=48.0, N_haed=3, A_kj=328.5, A_teng=44.0, ext_stairs=22.0, A_paid=4334.0, N_mod=66, N_rymi=66,
     BVT_H=1.06,          # Hamranes EAC (BVT maí 2025 ~200) -> verðlag framkvæmda 2027
-    VBC_rate=317.0,      # þ.kr/m² eininga án VSK, Akureyrar-tilboð VBC apr. 2026 (IS-10 24,7 m.kr / ~76 m², m. BANO), EUR 145
-    VBC_ti=39.0,         # þ.kr/m² flutningur+uppsetning (Akureyri 233 m.kr / 5.963 m²)
+    # VBC einingaskrá (v1.7, 24.9.2026): Hamranes-hæð = 12 íbúðaeiningar + 8 miðeiningar + 2 stigahúseiningar (IS-70)
+    IS10_eur=170367.0,   # EUR/eining: IS-10/11/13 herbergi–gangur–herbergi, fullbúin m. BANO (Mark Kane 20.4.2026, −7% léttari grind)
+    IS12_eur=150745.0,   # EUR/eining: IS-12 herbergi–gangur–þvottur/skol + gesta-WC, fullbúin m. BANO (sama tilboð)
+    shell_eur=1196.0,    # EUR/m²: shell-eining (orange) = Hamranes CO1 Rev5 stál 608 + klæðning 398 + gluggar 36 + verksmiðjuvinna 244 = 1.286 × 0,93
+    ti_eur=20594.0,      # EUR/eining flutningur 15.000 + uppsetning 5.594 (Akureyrar-forsendur Sveins 28.4.2026; Hamranes raun CO2+CO3 = 20.009)
+    N_IS10=10, N_IS12=2, A_central=376.7, A_IS70=41.5, N_mod_floor=22,
     VBC_disc=0.0, VBC_light=0.03, VBC_eng=40.0, EURISK=145.0,
     IF_fee=0.06,
     kj_rate=None,        # computed bottom-up
     teng_rate=400.0, teng_lyfting=12.0, A2_inngrip=60.0, live_site=45.0,
-    gatn=38.0,           # þ.kr/m² gatnagerðargjald (Hfj 2025: 36,3; Mosfellsbær 496/2017 - staðfesta)
+    gatn=49.7,           # þ.kr/m² gatnagerðargjald Mosfellsbæjar: 15% af byggingarkostnaði vísitöluhúss = 48.294 kr/m² frá 1.7.2026 (gjaldskrá mos.is; Q&A 8, 11.9.2026: fullt gjald, flokkur þjónustuhúsnæðis, af öllu brúttóflatarmáli) × ~1,03 til byggingarleyfis 2027
     bbm_rate=616.0,      # brunabótamat þ.kr/m² (HMS vinnumat Hamranes)
     fmat_rate=309.0,     # fasteignamat húss þ.kr/m²
     lodmat=150.0,        # lóðarmat m.kr (áætlun; leigulóð)
@@ -57,17 +61,23 @@ def lines(p):
     add(3,'3.2','Viðbót: eldhús-, sjúkraþjálfunar- og tæknilagnir í kjallara',1,'heild',15.0,'Mat; Hamranes 1. hæð','Miðlæg rými í kjallara í stað 1. hæðar.')
     add(4,'4.1','Raflagnir, lýsing, öryggis- og hússtjórnarkerfi (Hamranes-hlutfall)',A_built,'m²',HAM['ch4']*H,'Hamranes EAC kafli 4: 333,2 m.kr / 6.730 m² = 49,5 þ/m²','Sömu kerfi og kröfulýsing (sama FSRE-sniðmát).')
     add(5,'5.1','Frágangur innanhúss utan eininga: kjallari, stigahús, tengingar (Hamranes-hlutfall)',A_built,'m²',HAM['ch5']*H,'Hamranes EAC kafli 5: 256,0 m.kr / 6.730 m² = 38,0 þ/m²','Hamranes-hlutfallið innihélt fullfrágengna 1. hæð (1.385 m² steypt) — hér kjallari 750 m².')
-    # 6 VBC
-    add(6,'6.1','VBC-einingar, 66 stk (22/hæð, Hamranes IS-6x), fullbúnar með BANO — Akureyrar-verð',A_mod,'m²',p['VBC_rate']*(1-p['VBC_disc'])*(1-p['VBC_light']),'VBC tilboð f. Akureyri 20.4.2026 (Mark Kane, endursent 23.9.2026): IS-10 €170.367, IS-13 €150.745 m. BANO eftir 7% lækkun v. léttari stálgrindar; × 145 = 24,70 / 21,86 m.kr → 1.893 m.kr / 5.963 m² = 317 þ/m². Að auki VBC_light 3% fyrir enn léttara burðarvirki: 3 hæðir í stað 5 og jarðskjálftaálag 0,15 g í Mosfellsbæ (GIR Verkís) á móti 0,20 g í Hafnarfirði/Garðabæ — ÓSTAÐFEST, VBC að staðfesta. Hamranes samningur: 2.097,5 m.kr / 6.730 m² = 312 þ/m² án BANO (+13,7 BANO)','Forsenda GT 4.9.2026: sömu verð og VBC gaf fyrir Akureyri. Hamranes-raun m. aukaverkum var 388 þ/m² — Akureyrar-grunnurinn er 8% lægri af því aukaverk (CO-6…CO-10) eru inni í verðinu.')
-    add(6,'6.2','Flutningur (Gdynia–Hafnarfjörður) og uppsetning eininga',A_mod,'m²',p['VBC_ti'],'Akureyri: 78 × 2,175 m.kr flutningur + 0,811 m.kr uppsetning = 233 m.kr / 5.963 m² = 39 þ/m²','Hamranes: 89,7 uppsetning + 231 flutningur = 320,7 / 6.730 = 47,7 þ/m².')
-    add(6,'6.3','VBC hönnunar- og verkfræðiþóknun (endurtekin hönnun)',1,'heild',p['VBC_eng'],'Hamranes B-5: 97 m.kr fyrir frumhönnun','Endurnýting IS-6x eininga; aðlögun að 3 hæðum og kjallara.')
+    # 6 VBC — einingaskrá (v1.7): Hamranes-hæðin 2.–5. sem einingar, stigahúseiningar IS-70 út (opnir stigar B-rými, liður 7.2)
+    A_end = 2*p['A_IS70'] - (p['A_haed_gross'] - p['A_haed'])   # það sem eftir stendur af endaeiningum (lagnaskakt, geymsla, útgangur): 83 − 48 = 35 m²/hæð
+    p['A_end'] = A_end
+    kE = p['EURISK']/1000.0*(1-p['VBC_disc'])*(1-p['VBC_light'])
+    add(6,'6.1','Íbúðaeiningar IS-10/IS-11/IS-13 (herbergi–gangur–herbergi, 2 rými, 74,7 m²), fullbúnar með BANO — 10 á hæð',p['N_haed']*p['N_IS10'],'stk',p['IS10_eur']*kE,'VBC tilboð f. Akureyri 20.4.2026 (Mark Kane, endursent 23.9.2026): IS-10 €183.191 → €170.367 eftir 7% lækkun v. léttari stálgrindar, með BANO. Hamranes einingaskrá (250101 module sequence / ModulesForTransport): 4 IS-10 + 4 IS-11 + 2 IS-13 á hæð, stöður 02–06 og 16–21','Sömu einingar og á Hamranesi (IS-10A/11A/13B í framleiðslu). BANO er krafa í Þ113 (kröfulýsing 3.7.2). VBC_light 3% (3 hæðir, 0,15 g) ofan á — ÓSTAÐFEST')
+    add(6,'6.2','Íbúðaeiningar IS-12 (herbergi–gangur–skol/þvottur + gesta-WC, 1 rými, 74,7 m²), fullbúnar með BANO — 2 á hæð',p['N_haed']*p['N_IS12'],'stk',p['IS12_eur']*kE,'Sama tilboð: IS-12 (Mark skrifaði IS-13) €162.093 → €150.745 með BANO. Hamranes: 2 IS-12 á hæð (stöður 07 og 16)','Ein íbúð + skol/þvottur/ræsting heimiliseiningar (4.1.6) í hverri einingu')
+    add(6,'6.3','Miðeiningar IS-30–IS-37 (setustofur, borðstofur, uppvask/eldhús, lyftur og forrými, vakt/skrifstofa, lyf, stoðrými) — shell-einingar, 8 á hæð',p['N_haed']*p['A_central'],'m²',p['shell_eur']*kE,'Hamranes CO1 Rev5 elemental (3.12.2025): liðir sem gilda um orange/shell-rými = stál 608 + klæðning/boarding 398 + gluggar/útihurðir 36 + verksmiðjuvinna 244 + hönnun 0,4 = €1.286/m² × 0,93 = €1.196/m². Stærðir úr einingaskrá: 2 × 67,4 + 2 × 56,9 + 4 × 32,0 = 376,7 m²/hæð. Litamerkt scope-plan VBC 2.4.2025 (Floors 2–5): allt miðsvæðið „shell specification only“','Innréttingar, loft, gólf, 2./3. fix lagna og rafmagns í miðrýmum eru á staðnum í köflum 3–5 (Hamranes-hlutfall, sama skipting og á Hamranesi). Afleidd tala, ekki tilboð: ±15% (Húsavíkur-ROM jan. 2026 gefur 5% hærra á heildina, sjá blað Einingar VBC)')
+    add(6,'6.4','Endaeiningar í stað stigahúseininga IS-70: lagnaskakt, geymsla og útgangur á opinn flóttastiga — shell, 2 á hæð',p['N_haed']*A_end,'m²',p['shell_eur']*kE,'IS-70 á Hamranesi = 4,54 × 9,15 = 41,5 m² (stigi 19 + lagnaskakt 9 + geymsla 6 nettó), 2 á hæð, stöður 01 og 22, shell-eining án stiga. Hér falla stigarnir út (48 m²/hæð) og 35 m² standa eftir sem stutt endaeining','Sparar 6 × 41,5 m² shell = 43 m.kr og flutning; stiginn sjálfur í lið 7.2. Ef lokuð stigahús aftur (stair_m2 = 0) reiknast fullar IS-70 einingar sjálfkrafa')
+    add(6,'6.5','Flutningur Chojnice–Gdynia–Hafnarfjörður og uppsetning, á einingu (22 á hæð)',p['N_haed']*p['N_mod_floor'],'stk',p['ti_eur']*p['EURISK']/1000.0,'Akureyrar-forsendur Sveins 28.4.2026: €15.000 flutningur + €5.594 uppsetning á einingu (Mark: markaður flöktandi, staðfest nær tíma). Hamranes raun: CO2 flutningur €1,6 M + CO3 uppsetning €621 þ / 111 einingar = €20.009','Flatt á einingu; 12 af 66 eru stuttar (7 m) svo þetta er varfærið')
+    add(6,'6.6','VBC hönnunar- og verkfræðiþóknun (endurtekin hönnun)',1,'heild',p['VBC_eng'],'Hamranes B-5: 97 m.kr fyrir frumhönnun','Endurnýting Hamranes-eininga; aðlögun að 3 hæðum, kjallara og endaeiningum.')
     # 7,8
     add(7,'7.1','Frágangur utanhúss: þak, klæðning, gluggar, svalir (Hamranes-hlutfall)',A_mod+p['A_teng'],'m²',HAM['ch7']*H,'Hamranes EAC kafli 7: 274,7 m.kr / 6.730 m² = 40,8 þ/m²','Kjallari neðanjarðar að mestu — reiknað á hæðir + tengigang.')
     add(7,'7.2','Utanáliggjandi flóttastigar úr stáli, 2 stk × 3 hæðir, heitgalvaniseraðir með pöllum, útgangshurðum og skyggnum (B-rými)',1,'heild',p['ext_stairs'],'Mat ÍF; húsrýmisáætlun FSRE 4.5.4 „opinn flóttastigi“ (B-rými utan heildarflatarmáls); Húsavík: forsteyptur stigi 1,6 m.kr/hæð','Koma í stað lokaðra flóttastigahúsa Hamraness (240 m² brúttó A-rými). 2 × 3 hæðarbil × ~3,0 m.kr + 6 hurðir/skyggni ~4 m.kr. Forsenda GT 4.9.2026')
     add(8,'8.1','Lóðarfrágangur: endurgerð dvalarsvæðis norðan 2A, bílastæði, þjónustuaðkoma frá Skeiðholti, girðingar, gróður',1,'heild',120.0,'Hamranes kafli 8: 106 m.kr; kröfulýsing Þ113 og samkomulag um byggingarrétt (rafstrengir á kostnað Mosfellsbæjar)','Lítil lóð en endurgerð svæðis 2A og sér lóðaruppdráttur áskilinn.')
-    return L, dict(A_mod=A_mod, A_built=A_built)
+    return L, dict(A_mod=A_mod, A_built=A_built, A_end=A_end)
 
-UNC = {0:0.05,1:0.20,2:0.12,3:0.08,4:0.08,5:0.08,6:0.03,7:0.08,8:0.15}
+UNC = {0:0.05,1:0.20,2:0.12,3:0.08,4:0.08,5:0.08,6:0.05,7:0.08,8:0.15}  # 6: tilboðsliðir 3% (79%) + afleiddir shell-liðir 15% (21%) ≈ 5%
 
 def cost(p):
     L, A = lines(p)
