@@ -5,7 +5,7 @@ BASE = dict(
     BVT_H=1.06,          # Hamranes EAC (BVT maí 2025 ~200) -> verðlag framkvæmda 2027
     VBC_rate=317.0,      # þ.kr/m² eininga án VSK, Akureyrar-tilboð VBC apr. 2026 (IS-10 24,7 m.kr / ~76 m², m. BANO), EUR 145
     VBC_ti=39.0,         # þ.kr/m² flutningur+uppsetning (Akureyri 233 m.kr / 5.963 m²)
-    VBC_disc=0.0, VBC_eng=40.0, EURISK=145.0,
+    VBC_disc=0.0, VBC_light=0.03, VBC_eng=40.0, EURISK=145.0,
     IF_fee=0.06,
     kj_rate=None,        # computed bottom-up
     teng_rate=400.0, teng_lyfting=12.0, A2_inngrip=60.0, live_site=45.0,
@@ -58,7 +58,7 @@ def lines(p):
     add(4,'4.1','Raflagnir, lýsing, öryggis- og hússtjórnarkerfi (Hamranes-hlutfall)',A_built,'m²',HAM['ch4']*H,'Hamranes EAC kafli 4: 333,2 m.kr / 6.730 m² = 49,5 þ/m²','Sömu kerfi og kröfulýsing (sama FSRE-sniðmát).')
     add(5,'5.1','Frágangur innanhúss utan eininga: kjallari, stigahús, tengingar (Hamranes-hlutfall)',A_built,'m²',HAM['ch5']*H,'Hamranes EAC kafli 5: 256,0 m.kr / 6.730 m² = 38,0 þ/m²','Hamranes-hlutfallið innihélt fullfrágengna 1. hæð (1.385 m² steypt) — hér kjallari 750 m².')
     # 6 VBC
-    add(6,'6.1','VBC-einingar, 66 stk (22/hæð, Hamranes IS-6x), fullbúnar með BANO — Akureyrar-verð',A_mod,'m²',p['VBC_rate']*(1-p['VBC_disc']),'VBC tilboð f. Akureyri (apr. 2026): IS-10 24,70 m.kr, IS-13 21,86 m.kr án VSK, EUR 145 → 1.893 m.kr / 5.963 m² = 317 þ/m² m. BANO. Hamranes samningur: 2.097,5 m.kr / 6.730 m² = 312 þ/m² án BANO (+13,7 BANO)','Forsenda GT 4.9.2026: sömu verð og VBC gaf fyrir Akureyri. Hamranes-raun m. aukaverkum var 388 þ/m² — Akureyrar-grunnurinn er 8% lægri af því aukaverk (CO-6…CO-10) eru inni í verðinu.')
+    add(6,'6.1','VBC-einingar, 66 stk (22/hæð, Hamranes IS-6x), fullbúnar með BANO — Akureyrar-verð',A_mod,'m²',p['VBC_rate']*(1-p['VBC_disc'])*(1-p['VBC_light']),'VBC tilboð f. Akureyri 20.4.2026 (Mark Kane, endursent 23.9.2026): IS-10 €170.367, IS-13 €150.745 m. BANO eftir 7% lækkun v. léttari stálgrindar; × 145 = 24,70 / 21,86 m.kr → 1.893 m.kr / 5.963 m² = 317 þ/m². Að auki VBC_light 3% fyrir enn léttara burðarvirki: 3 hæðir í stað 5 og jarðskjálftaálag 0,15 g í Mosfellsbæ (GIR Verkís) á móti 0,20 g í Hafnarfirði/Garðabæ — ÓSTAÐFEST, VBC að staðfesta. Hamranes samningur: 2.097,5 m.kr / 6.730 m² = 312 þ/m² án BANO (+13,7 BANO)','Forsenda GT 4.9.2026: sömu verð og VBC gaf fyrir Akureyri. Hamranes-raun m. aukaverkum var 388 þ/m² — Akureyrar-grunnurinn er 8% lægri af því aukaverk (CO-6…CO-10) eru inni í verðinu.')
     add(6,'6.2','Flutningur (Gdynia–Hafnarfjörður) og uppsetning eininga',A_mod,'m²',p['VBC_ti'],'Akureyri: 78 × 2,175 m.kr flutningur + 0,811 m.kr uppsetning = 233 m.kr / 5.963 m² = 39 þ/m²','Hamranes: 89,7 uppsetning + 231 flutningur = 320,7 / 6.730 = 47,7 þ/m².')
     add(6,'6.3','VBC hönnunar- og verkfræðiþóknun (endurtekin hönnun)',1,'heild',p['VBC_eng'],'Hamranes B-5: 97 m.kr fyrir frumhönnun','Endurnýting IS-6x eininga; aðlögun að 3 hæðum og kjallara.')
     # 7,8

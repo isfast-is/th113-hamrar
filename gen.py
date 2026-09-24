@@ -17,12 +17,12 @@ def b64file(fn):
     with open(os.path.join(HERE, "assets", fn), "rb") as f: return base64.b64encode(f.read()).decode()
 
 SCEN = [
- ("Grunnur v1.5: opnir stigar, kjallari 328,5, tengigangur 44 — byggt = greitt", {}),
- ("Lokuð flóttastigahús, kjallari 300, 110 m² tengigangur (v1.2)", dict(A_haed_override=1368.5, stair_m2=0.0, ext_stairs=0.0, A_teng=110.0, A_kj=300.0)),
- ("Besta tilfelli: VBC −5%, 18 mán", dict(VBC_disc=0.05, build_months=18)),
+ ("Grunnur v1.6: opnir stigar, kjallari 328,5, tengigangur 44, BANO, −3% grind — byggt = greitt", {}),
+ ("Lokuð flóttastigahús, kjallari 300, 110 m² tengigangur, engin grindarlækkun (v1.2)", dict(A_haed_override=1368.5, stair_m2=0.0, ext_stairs=0.0, A_teng=110.0, A_kj=300.0, VBC_light=0.0)),
+ ("Besta tilfelli: VBC −5% til viðbótar, 18 mán", dict(VBC_disc=0.05, build_months=18)),
  ("Frekari þjöppun hæðar í 1.300 m² (snertir skipulag setustofa)", dict(A_haed_override=1300.0)),
- ("Varfærið: kj 500, teng 200 steypt, 24 mán, krafa 6,0%, verðb. 1,09", dict(A_kj=500.0, A_teng=200.0, teng_rate=480.0, gatn=42.0, build_months=24, yld=0.060, live_site=60.0, A2_inngrip=80.0, BVT_H=1.09)),
- ("Upphaflegt prógramm GT: kj 750, teng 320 steypt, lokuð stigahús", dict(A_kj=750.0, A_teng=320.0, teng_rate=480.0, stair_m2=0.0, ext_stairs=0.0)),
+ ("Varfærið: kj 500, teng 200 steypt, 24 mán, krafa 6,0%, verðb. 1,09, engin grindarlækkun", dict(A_kj=500.0, A_teng=200.0, teng_rate=480.0, gatn=42.0, build_months=24, yld=0.060, live_site=60.0, A2_inngrip=80.0, BVT_H=1.09, VBC_light=0.0)),
+ ("Upphaflegt prógramm GT: kj 750, teng 320 steypt, lokuð stigahús, engin grindarlækkun", dict(A_kj=750.0, A_teng=320.0, teng_rate=480.0, stair_m2=0.0, ext_stairs=0.0, VBC_light=0.0)),
 ]
 LEV = [
  ("Lokuð flóttastigahús í stað opinna (aftur í 1.368,5 m²/hæð)", dict(stair_m2=0.0, ext_stairs=0.0), "Neikvæð: 144 m² A-rými + einingar"),
@@ -30,7 +30,9 @@ LEV = [
  ("Kjallari 328,5 → 450 m² (ef FSRE/Eir krefjast fleiri miðlægra rýma)", dict(A_kj=450.0), "Neikvæð"),
  ("Tengigangur 44 → 110 m² (nýbygging fjær gafli Hamra)", dict(A_teng=110.0), "Neikvæð: hver 10 m á 2 hæðum ≈ 60 m²"),
  ("Tengigangur 44 → 200 m² steypt tengibygging (ef krafist)", dict(A_teng=200.0, teng_rate=480.0), "Neikvæð"),
- ("VBC-afsláttur 5% umfram Akureyrar-verð", dict(VBC_disc=0.05), "VBC þarf verk og traustsyfirlýsingu eftir seinkunina"),
+ ("Léttara burðarvirki EKKI staðfest af VBC (3% → 0)", dict(VBC_light=0.0), "Neikvæð: ef VBC gefur ekkert fyrir 3 hæðir / 0,15 g"),
+ ("Léttara burðarvirki 3% → 5%", dict(VBC_light=0.05), "Efri mörk næmni"),
+ ("VBC-afsláttur 5% til viðbótar", dict(VBC_disc=0.05), "VBC þarf verk og traustsyfirlýsingu eftir seinkunina"),
  ("VBC-afsláttur 10%", dict(VBC_disc=0.10), "Ólíklegra"),
  ("ÍF-þóknun 6% → 5%", dict(IF_fee=0.05), "Ákvörðun ÍF"),
  ("Gatnagerðargjald 38 → 25 þ/m²", dict(gatn=25.0), "Samþykkt 496/2017 — staðfesta"),
@@ -57,7 +59,7 @@ ceiling = C['total'] * (lo + hi) / 2
 def chart():
     W, Hh, L, T, Rr, B = 760, 330, 60, 20, 20, 50
     xs = list(range(5400, 6401, 50))
-    series = [("Grunnur", {}, "#1D5FA8"), ("Besta tilfelli (VBC −5%, 18 mán)", dict(VBC_disc=0.05, build_months=18), "#2a9d5c"), ("Lokuð stigahús + 110 m² tengigangur (v1.2)", dict(A_haed_override=1368.5, stair_m2=0.0, ext_stairs=0.0, A_teng=110.0, A_kj=300.0), "#c0504d")]
+    series = [("Grunnur", {}, "#1D5FA8"), ("Besta tilfelli (VBC −5% til viðbótar, 18 mán)", dict(VBC_disc=0.05, build_months=18), "#2a9d5c"), ("Lokuð stigahús + 110 m² tengigangur, engin grindarlækkun (v1.2)", dict(A_haed_override=1368.5, stair_m2=0.0, ext_stairs=0.0, A_teng=110.0, A_kj=300.0, VBC_light=0.0), "#c0504d")]
     ymin, ymax = 0.08, 0.16
     def X(v): return L + (v - 5400) / 1000 * (W - L - Rr)
     def Y(v): return T + (ymax - v) / (ymax - ymin) * (Hh - T - B)
@@ -123,10 +125,13 @@ DL = f'''<div class="dl">
 <a download="Þ113 Hamrar - Rökstuðningsskjal v1.6 04.09.2026.pdf" href="data:application/pdf;base64,{b64file("memo.pdf")}">⬇ Rökstuðningsskjal v1.6 (PDF)</a>
 </div>'''
 
+M2R = f"{A['A_built']/66:.1f}".replace('.', ',')
+RENT_ROOM = n0(p['rent']*p['A_paid']/66/1000)
 kpi = f'''<div class="kpis">
 <div class="kpi"><div class="v">{n0(C['total'])} <span>m.kr</span></div><div class="l">Heildarfjárfesting án VSK, með fjármagni</div></div>
 <div class="kpi"><div class="v">{n0(C['total']*1000/p['A_paid'])} <span>þ.kr/m²</span></div><div class="l">Á greiddan = byggðan m² (Hamranes 815)</div></div>
-<div class="kpi"><div class="v">{n0(A['A_built'])} <span>m²</span></div><div class="l">Byggt = greitt 4.334, ekkert umfram</div></div>
+<div class="kpi"><div class="v">{n0(A['A_built'])} <span>m²</span></div><div class="l">Byggt = greitt 4.334, ekkert umfram = {M2R} m²/rými</div></div>
+<div class="kpi"><div class="v">{RENT_ROOM} <span>þ.kr/rými/mán</span></div><div class="l">Samanburðargrunnur FSRE: tilboð × 4.334 / 66 (Hamranes 5.950 × 65 = 387)</div></div>
 <div class="kpi"><div class="v">{pct(R['irr_n'])}</div><div class="l">IRR eiginfjár nafn við 5.650 ({pct(R['irr_r'])} raun)</div></div>
 <div class="kpi"><div class="v">{n0(rent_for_irr(p,0.12,C))} <span>kr/m²</span></div><div class="l">Leiga fyrir 12% (besta tilfelli {n0(rent_for_irr(*run(dict(VBC_disc=0.05,build_months=18))[:1], 0.12, run(dict(VBC_disc=0.05,build_months=18))[1]))})</div></div>
 <div class="kpi"><div class="v">{n0(R['equity'])} <span>m.kr</span></div><div class="l">Eigið fé Stafa (35%), losun +{n0(R['release'])} við endurfjármögnun</div></div>
@@ -154,13 +159,13 @@ td{{padding:5px 7px;border-bottom:1px solid #eef2f6;vertical-align:top}} td.n,th
 .scroll{{overflow-x:auto}} footer{{text-align:center;color:#8898a8;font-size:11.5px;padding:20px}} footer a{{color:#8898a8}}
 @media print{{nav,.dl{{display:none}}.co{{break-inside:avoid;border:none;box-shadow:none}}}}
 </style></head><body>
-<header><h1>Þ113 Hamrar, Mosfellsbær — tilboð Stafa</h1><div class="sub">Kostnaðaráætlun og leiguverðsmódel · Hamranes endurtekið í þéttu prógrammi · útgáfa 1.5/1.6, 4. september 2026 · TRÚNAÐARMÁL</div></header>
+<header><h1>Þ113 Hamrar, Mosfellsbær — tilboð Stafa</h1><div class="sub">Kostnaðaráætlun og leiguverðsmódel · Hamranes endurtekið í þéttu prógrammi · útgáfa 1.6/1.7, 24. september 2026 · TRÚNAÐARMÁL</div></header>
 <nav><a href="#nidurstada">Niðurstaða</a><a href="#husid">Húsið og rýmistafla</a><a href="#kostnadur">Kostnaðaráætlun</a><a href="#leiga">Leigumódel</a><a href="#svidsmyndir">Sviðsmyndir</a><a href="#bil">Bilgreining</a><a href="#haefi">Hæfi Stafa</a><a href="#naest">Næstu skref</a><a href="#skjol">Skjöl</a></nav>
 <main>
 <div class="co" id="nidurstada"><h2>1. Niðurstaða</h2>
 {kpi}
-<p class="hl"><b>Kenningin um byggingarkostnað heldur:</b> húsið kostar {n0(C['total']*1000/A['A_built'])} þ.kr á byggðan fermetra, á pari við Hamranes (815 með fjármagni), þrátt fyrir klöpp, tengigang og inngrip í 2A. <b>Stærðin réð úrslitum og hún er leyst:</b> Hamranes-hæðirnar 2–5 óbreyttar nema lokuðu flóttastigahúsin (48 m²/hæð) fara út og opnir utanáliggjandi stálstigar koma í staðinn sem B-rými, tengigangurinn er 44 m² eins og FSRE reiknar sjálft, og kjallarinn 328,5 m² ber miðlægu rýmin. Byggt = greitt = 4.334 m². <b>Við 5.650 kr/m² m.vsk skilar verkefnið Stöfum {pct(R['irr_n'])} nafnávöxtun eiginfjár ({pct(R['irr_r'])} raun); 12% nást við {n0(rent_for_irr(p,0.12,C))} í grunni.</b> Upphaflega prógrammið (750 m² kjallari, 320 m² steypt tengibygging, lokuð stigahús, 842 m² umfram) hefði gefið 9,1% og krafist 6.566.</p>
-<p><b>Ráðlegging:</b> tilboðsrammi 5.650–5.850 í þéttu prógrammi. 5.650 er verjandi gólf sem gefur {pct(R['irr_n'])} (11,8% með VBC-afslætti), 5.800 gefur 11,9% og 5.850 12,1% — allt innan vinningsbils Húsavíkur og Akureyrar (5.645–6.350). Þrennt þarf að negla fyrir 9.11.: opnu stigarnir gagnvart brunahönnun og FSRE, VBC-fastverð á Akureyrar-verðum, og afstaða FSRE/Eir til miðlægra rýma í kjallara.</p>
+<p class="hl"><b>Kenningin um byggingarkostnað heldur:</b>  húsið kostar {n0(C['total']*1000/A['A_built'])} þ.kr á byggðan fermetra, á pari við Hamranes (815 með fjármagni), þrátt fyrir klöpp, tengigang og inngrip í 2A. <b>Stærðin réð úrslitum og hún er leyst:</b> Hamranes-hæðirnar 2–5 óbreyttar nema lokuðu flóttastigahúsin (48 m²/hæð) fara út og opnir utanáliggjandi stálstigar koma í staðinn sem B-rými, tengigangurinn er 44 m² eins og FSRE reiknar sjálft, og kjallarinn 328,5 m² ber miðlægu rýmin. Byggt = greitt = 4.334 m². VBC-einingar á Akureyrar-verðum 20.4.2026 með BANO (krafa í kröfulýsingu 3.7.2) og 3% léttara burðarvirki fyrir 3 hæðir og 0,15 g í Mosfellsbæ (VBC að staðfesta). <b>Við 5.650 kr/m² m.vsk skilar verkefnið Stöfum {pct(R['irr_n'])} nafnávöxtun eiginfjár ({pct(R['irr_r'])} raun); 12% nást við {n0(rent_for_irr(p,0.12,C))} í grunni.</b> Upphaflega prógrammið (750 m² kjallari, 320 m² steypt tengibygging, lokuð stigahús, 842 m² umfram) hefði gefið 9,1% og krafist 6.566.</p>
+<p><b>Ráðlegging:</b> tilboðsrammi 5.650–5.850 í þéttu prógrammi. 5.650 er verjandi gólf sem gefur {pct(R['irr_n'])} (12,0% með frekari VBC-afslætti), 5.750 gefur 12,0% og 5.850 12,4% — á samanburðargrunni FSRE 371–384 þ.kr á rými á mánuði — allt innan vinningsbils Húsavíkur og Akureyrar (5.645–6.350). Þrennt þarf að negla fyrir 9.11.: opnu stigarnir gagnvart brunahönnun og FSRE, VBC-fastverð á Akureyrar-verðum, og afstaða FSRE/Eir til miðlægra rýma í kjallara.</p>
 {DL}
 </div>
 <div class="co" id="husid"><h2>2. Húsið og rýmistafla</h2>
@@ -170,7 +175,10 @@ td{{padding:5px 7px;border-bottom:1px solid #eef2f6;vertical-align:top}} td.n,th
 <div class="scroll">{tbl(["Nr.","Rými FSRE","FSRE","Þ113","Frávik","Hamranes-rými (rýmisskrá 24.8.2026)"],rym_floor,numcols=(2,3,4))}</div>
 <h3>Kjallarinn: 4.3 miðlæg rými (nettó m² FSRE)</h3>
 <div class="scroll">{tbl(["Nr.","Rými","m²","Sama rými á Hamranesi 1. hæð"],rym_kj,numcols=(2,))}</div>
-{tbl(["A-rými alls","FSRE brúttó","Þ113 byggt","Frávik"],[["Hæðir (4.1 + 4.2)","3.948,0","3.961,5","+13,5"],["Kjallari (4.3)","341,6","328,5","−13,1"],["Tengigangur (4.4)","44,0","44,0","0"],["<b>Samtals = greidd stærð</b>","<b>4.333,6</b>","<b>4.334,0</b>","<b>+0,4</b>"]],numcols=(1,2,3))}
+{tbl(["A-rými alls","FSRE brúttó","Þ113 byggt","Frávik","m²/rými FSRE","m²/rými Þ113"],[["Hæðir (4.1 + 4.2)","3.948,0","3.961,5","+13,5","59,8","60,0"],["Kjallari (4.3)","341,6","328,5","−13,1","5,2","5,0"],["Tengigangur (4.4)","44,0","44,0","0","0,7","0,7"],["<b>Samtals = greidd stærð</b>","<b>4.333,6</b>","<b>4.334,0</b>","<b>+0,4</b>","<b>65,7</b>","<b>65,7</b>"],["Viðmið FSRE 65 × 66 / Hamranes raun","4.290","—","—","65,0","69,7"]],numcols=(1,2,3,4,5))}
+<h3>Á hvert hjúkrunarrými — samanburðargrunnur FSRE</h3>
+<p>FSRE miðar leiguverð við 65 m² brúttó á rými og ber tilboð saman á þeim grunni: tilboð × 4.334 m² / 66 rými = leiga á rými á mánuði. Húsið okkar er {M2R} m²/rými, nákvæmlega greidda talan, á móti 69,7 á Hamranesi.</p>
+{tbl(["Tilboð kr/m² m.vsk","Leiga á rými þ.kr/mán","Samanburður"],[["5.650",n0(5650*p['A_paid']/66/1000),"gólf"],["5.750",n0(5750*p['A_paid']/66/1000),"12% í grunni"],["5.850",n0(5850*p['A_paid']/66/1000),"efri mörk ramma"],["Hamranes 5.950 × 65","387","tilboð HH til FSRE 1.7.2026, á 65 m²-grunni"],["Húsavík: Reitir/Rauðsvík 5.645","377","lægsta verð, opnun jan. 2026"],["Húsavík: Pekron 6.350","425","efstur á einkunn"],["Húsavík: Reitir/ÍF 6.775","453","okkar tilboð"]],numcols=(1,))}
 <p class="warn">Ekki byggt, þótt það væri á 1. hæð Hamraness: fundarrými 2 × 13,7, forstöðumaður 11,7, fótsnyrting 20,5, hársnyrting 21,8, fjölnotasalur 88,5, miðlægur línlager 29,0, matarvagnar 29,0 — 228 m² nettó sem Þ113-prógrammið biður ekki um (stjórnun Eirs og hársnyrting í 2A, Q&A 5.C). Kjallarinn ber 4.3-listann með álagi 1,35; tæknirými og lyfta/stigi þurfa að rúmast í álaginu. Opnir flóttastigar þurfa staðfestingu brunahönnuðar.</p>
 </div>
 <div class="co" id="kostnadur"><h2>3. Kostnaðaráætlun (Class 4, verðlag 2027–28, án VSK)</h2>
@@ -198,7 +206,7 @@ td{{padding:5px 7px;border-bottom:1px solid #eef2f6;vertical-align:top}} td.n,th
 <div class="co" id="naest"><h2>8. Næstu skref fyrir 9. nóvember</h2>
 <ul>
 <li><b>Arkís og brunahönnuður:</b> rúmmyndun á Langatanga 2B — rúmast Hamranes-hæðin, staðsetning gagnvart vesturgafli norðurálmu Hamra (tengigangur 44 m²), og standast opnir utanáliggjandi flóttastigar brunahönnun þriggja hæða hjúkrunarheimilis (rýming rúmliggjandi, veðurvörn, hálka)?</li>
-<li><b>VBC:</b> fastverðstilboð í 66 IS-6x einingar á Akureyrar-verðum með tafabótaábyrgð.</li>
+<li><b>VBC:</b> fastverðstilboð í 66 IS-6x einingar með BANO á Akureyrar-verðum 20.4.2026 (€170.367 / €150.745, endursend af Mark Kane 23.9.) með tafabótaábyrgð, og staðfesting á lækkun fyrir léttara burðarvirki (3 hæðir, 0,15 g) — reiknuð 3% í grunni. Verð án BANO eiga ekki við: BANO-jafngildi er krafa (3.7.2).</li>
 <li><b>Fyrirspurnir til FSRE fyrir 31.10.:</b> teljast miðlæg rými í kjallara (jarðhæð frá Skeiðholti) til 4.334 m²? Hvaða miðlæg rými má samnýta með Hömrum um tengiganginn? Teljast opnir utanáliggjandi flóttastigar B-rými (4.5.4) í þessu verki? Gatnagerðargjald Mosfellsbæjar og fasteignaskattsflokkur.</li>
 <li><b>Stjórn Stafa:</b> ávöxtunarviðmið (12% nafn) og eigið fé {n0(R['equity'])} m.kr samhliða arðgreiðslu 2026; óskipt ábyrgð ef byggt er á getu annarra.</li>
 <li><b>Það sem má ekki gerast:</b> að prógrammið stækki í hönnunarfasa. Hver 100 m² umfram 4.334 kosta 30–45 m.kr og 0,2–0,5 pp í ávöxtun.</li>
@@ -206,8 +214,8 @@ td{{padding:5px 7px;border-bottom:1px solid #eef2f6;vertical-align:top}} td.n,th
 </div>
 <div class="co" id="skjol"><h2>9. Skjöl og heimildir</h2>
 {DL}
-<p style="font-size:12.5px;color:#44566b">Frumgögn: útboðslýsing 25-0300, kröfulýsing, húsrýmisáætlun FSRE 17.08.26, samkomulag um byggingarrétt 10.7.2026, GIR Verkís, Q&A 4.9.2026 (mappa Claude Projects/Hamrar Þ113). Kostnaðargrunnar: Hamranes EAC 3.9.2026, Þursaholt/Heimar-áætlun 30.4.2026, Húsavík 2025. Rekstrar- og fjármögnunarforsendur: Hamranes-líkan v2.2. Rýmisskrá Hamraness 24.8.2026. Hæfi: undirritaðir ársreikningar Stafa 2025 og ársrit ÍFj 2025. Fyrirvarar: Class 4 (±15–25%); óstaðfest gatnagerðargjald Mosfellsbæjar, fasteignaskattsflokkur, brunahönnun opinna stiga, EUR/ISK 145, verðbætur 1,06, kjör Stafa (100 pkt).</p>
-<p style="font-size:12px;color:#8898a8">Síðan er reiknuð beint úr Python-spegli Excel-líkansins (model.py); Excel v1.5 er frumheimildin með lifandi formúlum. Unnið fyrir Gunnar Thoroddsen, 4. september 2026.</p>
+<p style="font-size:12.5px;color:#44566b">Frumgögn: útboðslýsing 25-0300, kröfulýsing, húsrýmisáætlun FSRE 17.08.26, samkomulag um byggingarrétt 10.7.2026, GIR Verkís, Q&A 4.9.2026 (mappa Claude Projects/Hamrar Þ113). Kostnaðargrunnar: Hamranes EAC 3.9.2026, Þursaholt/Heimar-áætlun 30.4.2026, Húsavík 2025. Rekstrar- og fjármögnunarforsendur: Hamranes-líkan v2.2. Rýmisskrá Hamraness 24.8.2026. Hæfi: undirritaðir ársreikningar Stafa 2025 og ársrit ÍFj 2025. Fyrirvarar: Class 4 (±15–25%); óstaðfest gatnagerðargjald Mosfellsbæjar, fasteignaskattsflokkur, brunahönnun opinna stiga, 3% lækkun VBC fyrir léttara burðarvirki, EUR/ISK 145, verðbætur 1,06, kjör Stafa (100 pkt).</p>
+<p style="font-size:12px;color:#8898a8">Síðan er reiknuð beint úr Python-spegli Excel-líkansins (model.py); Excel v1.5 er frumheimildin með lifandi formúlum. Unnið fyrir Gunnar Thoroddsen, 4. september 2026, uppfært 24. september 2026.</p>
 </div>
 </main>
 <footer>Þ113 Hamrar · Stafir / Íslenskar fasteignir · trúnaðarmál · <a href="#" onclick="try{{localStorage.removeItem('th113_pass')}}catch(e){{}};location.reload();return false;">Læsa þessu tæki</a></footer>
